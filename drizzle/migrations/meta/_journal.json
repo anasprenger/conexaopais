@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1789735821271,
+      "tag": "0000_secure_email_trigger_actions",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790084051362,
+      "tag": "0001_protect_private_profile_and_interaction_data",
+      "breakpoints": true
+    }
+  ]
+}
