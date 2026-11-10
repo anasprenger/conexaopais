@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
@@ -99,18 +98,6 @@ function AuthPage() {
     } finally {
       setEnviando(false);
     }
-  };
-
-  const entrarComGoogle = async () => {
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) {
-      toast.error("Não foi possível entrar com o Google.");
-      return;
-    }
-    if (result.redirected) return;
-    void navigate({ to: "/minha-conta" });
   };
 
   return (
@@ -223,16 +210,6 @@ function AuthPage() {
             {enviando ? "Aguarde..." : modo === "entrar" ? "Entrar" : modo === "criar" ? "Criar conta" : modo === "recuperar" ? "Enviar instruções" : "Salvar nova senha"}
           </Button>
         </form>
-
-        {(modo === "entrar" || modo === "criar") && <div className="my-6 flex items-center gap-4 text-xs uppercase tracking-widest text-muted-foreground">
-          <span className="h-px flex-1 bg-border" />
-          ou
-          <span className="h-px flex-1 bg-border" />
-        </div>}
-
-        {(modo === "entrar" || modo === "criar") && <Button variant="soft" className="w-full" onClick={entrarComGoogle}>
-          Continuar com o Google
-        </Button>}
 
         {(modo === "entrar" || modo === "criar") && <button
           type="button"
