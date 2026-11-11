@@ -18,6 +18,16 @@ export default defineConfig({
     server: { entry: "server" },
   },
   vite: {
+    build: {
+      rollupOptions: {
+        output: {
+          // A CDN da Hostinger serve arquivos .mjs como text/plain, o que impede o
+          // worker do PDF de carregar. Gera esses arquivos com a extensao .js.
+          assetFileNames: (asset) =>
+            asset.names?.[0]?.endsWith(".mjs") ? "assets/[name]-[hash].js" : "assets/[name]-[hash][extname]",
+        },
+      },
+    },
     resolve: {
       alias: {
         "entities/lib/decode.js": path.resolve(process.cwd(), "node_modules/entities/lib/decode.js"),
