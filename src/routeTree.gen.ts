@@ -28,6 +28,7 @@ import { Route as ProfissionaisIndexRouteImport } from './routes/profissionais.i
 import { Route as ProfissionaisSlugRouteImport } from './routes/profissionais.$slug'
 import { Route as RevistaIndexRouteImport } from './routes/revista.index'
 import { Route as RevistaSlugRouteImport } from './routes/revista.$slug'
+import { Route as RevistaSlugLerRouteImport } from './routes/revista_.$slug.ler'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
@@ -127,6 +128,11 @@ const RevistaSlugRoute = RevistaSlugRouteImport.update({
   path: '/revista/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RevistaSlugLerRoute = RevistaSlugLerRouteImport.update({
+  id: '/revista_/$slug/ler',
+  path: '/revista/$slug/ler',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   id: '/lovable/email/auth/preview',
   path: '/lovable/email/auth/preview',
@@ -164,6 +170,7 @@ export interface FileRoutesByFullPath {
   '/colunas/': typeof ColunasIndexRoute
   '/profissionais/': typeof ProfissionaisIndexRoute
   '/revista/': typeof RevistaIndexRoute
+  '/revista/$slug/ler': typeof RevistaSlugLerRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -188,6 +195,7 @@ export interface FileRoutesByTo {
   '/colunas': typeof ColunasIndexRoute
   '/profissionais': typeof ProfissionaisIndexRoute
   '/revista': typeof RevistaIndexRoute
+  '/revista/$slug/ler': typeof RevistaSlugLerRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -213,6 +221,7 @@ export interface FileRoutesById {
   '/colunas/': typeof ColunasIndexRoute
   '/profissionais/': typeof ProfissionaisIndexRoute
   '/revista/': typeof RevistaIndexRoute
+  '/revista_/$slug/ler': typeof RevistaSlugLerRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -239,6 +248,7 @@ export interface FileRouteTypes {
     | '/colunas/'
     | '/profissionais/'
     | '/revista/'
+    | '/revista/$slug/ler'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
@@ -263,6 +273,7 @@ export interface FileRouteTypes {
     | '/colunas'
     | '/profissionais'
     | '/revista'
+    | '/revista/$slug/ler'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
@@ -287,6 +298,7 @@ export interface FileRouteTypes {
     | '/colunas/'
     | '/profissionais/'
     | '/revista/'
+    | '/revista_/$slug/ler'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
@@ -312,6 +324,7 @@ export interface RootRouteChildren {
   ColunasIndexRoute: typeof ColunasIndexRoute
   ProfissionaisIndexRoute: typeof ProfissionaisIndexRoute
   RevistaIndexRoute: typeof RevistaIndexRoute
+  RevistaSlugLerRoute: typeof RevistaSlugLerRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
@@ -452,6 +465,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RevistaSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/revista_/$slug/ler': {
+      id: '/revista_/$slug/ler'
+      path: '/revista/$slug/ler'
+      fullPath: '/revista/$slug/ler'
+      preLoaderRoute: typeof RevistaSlugLerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/auth/preview': {
       id: '/lovable/email/auth/preview'
       path: '/lovable/email/auth/preview'
@@ -496,6 +516,7 @@ const rootRouteChildren: RootRouteChildren = {
   ColunasIndexRoute: ColunasIndexRoute,
   ProfissionaisIndexRoute: ProfissionaisIndexRoute,
   RevistaIndexRoute: RevistaIndexRoute,
+  RevistaSlugLerRoute: RevistaSlugLerRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
