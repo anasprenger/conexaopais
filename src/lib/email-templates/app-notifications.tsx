@@ -3,7 +3,7 @@ import { Body, Button, Container, Head, Heading, Html, Preview, Text } from "@re
 import type { TemplateEntry } from "./registry";
 import { brand, button, container, detail, footer, main, text } from "./styles";
 
-const SITE_URL = "https://conexaopais.com.br";
+const SITE_URL = "https://conexaopais.com";
 
 function Frame({ preview, title, children, action, actionLabel }: { preview: string; title: string; children: React.ReactNode; action?: string; actionLabel?: string }) {
   return <Html lang="pt-BR" dir="ltr"><Head /><Preview>{preview}</Preview><Body style={main}><Container style={container}>

@@ -44,8 +44,32 @@ function isH3SwallowedErrorBody(body: string): boolean {
   }
 }
 
+// Endereço principal do site. Os outros domínios abaixo redirecionam para ele
+// (redirecionamento permanente, mantendo a página e os parâmetros da URL).
+const DOMINIO_PRINCIPAL = "conexaopais.com";
+const DOMINIOS_QUE_REDIRECIONAM = new Set([
+  "conexaopais.com.br",
+  "www.conexaopais.com.br",
+]);
+
+function redirecionarDominio(request: Request): Response | null {
+  const hostHeader =
+    request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? "";
+  const host = hostHeader.split(",")[0].trim().toLowerCase().replace(/:\d+$/, "");
+  if (!DOMINIOS_QUE_REDIRECIONAM.has(host)) return null;
+
+  const url = new URL(request.url);
+  return new Response(null, {
+    status: 301,
+    headers: { location: `https://${DOMINIO_PRINCIPAL}${url.pathname}${url.search}` },
+  });
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    const redirecionamento = redirecionarDominio(request);
+    if (redirecionamento) return redirecionamento;
+
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
