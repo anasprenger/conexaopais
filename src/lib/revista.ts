@@ -3,6 +3,9 @@ import { revistas, type PaginaRevista } from "@/data/mock";
 import { revistaPublicadaPorSlug } from "@/lib/publicacoes";
 
 export type Edicao = {
+  /** Só existe nas edições publicadas pelo site (no banco); as de exemplo não têm. */
+  id: string | null;
+  autorId: string | null;
   slug: string;
   etiqueta: string;
   titulo: string;
@@ -18,6 +21,8 @@ export async function carregarEdicao(slug: string): Promise<Edicao> {
   const estatica = revistas.find((r) => r.slug === slug);
   if (estatica) {
     return {
+      id: null,
+      autorId: null,
       slug: estatica.slug,
       etiqueta: `Edição ${String(estatica.edicao).padStart(2, "0")} · ${estatica.data}`,
       titulo: estatica.titulo,
@@ -32,6 +37,8 @@ export async function carregarEdicao(slug: string): Promise<Edicao> {
   const doBanco = await revistaPublicadaPorSlug(slug).catch(() => null);
   if (!doBanco) throw notFound();
   return {
+    id: doBanco.id,
+    autorId: doBanco.autorId,
     slug: doBanco.slug,
     etiqueta: doBanco.data,
     titulo: doBanco.titulo,

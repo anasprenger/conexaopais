@@ -20,6 +20,7 @@ import { Route as NovaPostagemRouteImport } from './routes/nova-postagem'
 import { Route as SejaProfissionalRouteImport } from './routes/seja-profissional'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as AdminProfissionaisRouteImport } from './routes/admin.profissionais'
+import { Route as AdminUsuariosRouteImport } from './routes/admin.usuarios'
 import { Route as ArtigosIndexRouteImport } from './routes/artigos.index'
 import { Route as ArtigosSlugRouteImport } from './routes/artigos.$slug'
 import { Route as ColunasIndexRouteImport } from './routes/colunas.index'
@@ -86,6 +87,11 @@ const SobreRoute = SobreRouteImport.update({
 const AdminProfissionaisRoute = AdminProfissionaisRouteImport.update({
   id: '/admin/profissionais',
   path: '/admin/profissionais',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminUsuariosRoute = AdminUsuariosRouteImport.update({
+  id: '/admin/usuarios',
+  path: '/admin/usuarios',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ArtigosIndexRoute = ArtigosIndexRouteImport.update({
@@ -162,6 +168,7 @@ export interface FileRoutesByFullPath {
   '/seja-profissional': typeof SejaProfissionalRoute
   '/sobre': typeof SobreRoute
   '/admin/profissionais': typeof AdminProfissionaisRoute
+  '/admin/usuarios': typeof AdminUsuariosRoute
   '/artigos/$slug': typeof ArtigosSlugRoute
   '/colunas/$slug': typeof ColunasSlugRoute
   '/profissionais/$slug': typeof ProfissionaisSlugRoute
@@ -187,6 +194,7 @@ export interface FileRoutesByTo {
   '/seja-profissional': typeof SejaProfissionalRoute
   '/sobre': typeof SobreRoute
   '/admin/profissionais': typeof AdminProfissionaisRoute
+  '/admin/usuarios': typeof AdminUsuariosRoute
   '/artigos/$slug': typeof ArtigosSlugRoute
   '/colunas/$slug': typeof ColunasSlugRoute
   '/profissionais/$slug': typeof ProfissionaisSlugRoute
@@ -213,6 +221,7 @@ export interface FileRoutesById {
   '/seja-profissional': typeof SejaProfissionalRoute
   '/sobre': typeof SobreRoute
   '/admin/profissionais': typeof AdminProfissionaisRoute
+  '/admin/usuarios': typeof AdminUsuariosRoute
   '/artigos/$slug': typeof ArtigosSlugRoute
   '/colunas/$slug': typeof ColunasSlugRoute
   '/profissionais/$slug': typeof ProfissionaisSlugRoute
@@ -240,6 +249,7 @@ export interface FileRouteTypes {
     | '/seja-profissional'
     | '/sobre'
     | '/admin/profissionais'
+    | '/admin/usuarios'
     | '/artigos/$slug'
     | '/colunas/$slug'
     | '/profissionais/$slug'
@@ -265,6 +275,7 @@ export interface FileRouteTypes {
     | '/seja-profissional'
     | '/sobre'
     | '/admin/profissionais'
+    | '/admin/usuarios'
     | '/artigos/$slug'
     | '/colunas/$slug'
     | '/profissionais/$slug'
@@ -290,6 +301,7 @@ export interface FileRouteTypes {
     | '/seja-profissional'
     | '/sobre'
     | '/admin/profissionais'
+    | '/admin/usuarios'
     | '/artigos/$slug'
     | '/colunas/$slug'
     | '/profissionais/$slug'
@@ -316,6 +328,7 @@ export interface RootRouteChildren {
   SejaProfissionalRoute: typeof SejaProfissionalRoute
   SobreRoute: typeof SobreRoute
   AdminProfissionaisRoute: typeof AdminProfissionaisRoute
+  AdminUsuariosRoute: typeof AdminUsuariosRoute
   ArtigosSlugRoute: typeof ArtigosSlugRoute
   ColunasSlugRoute: typeof ColunasSlugRoute
   ProfissionaisSlugRoute: typeof ProfissionaisSlugRoute
@@ -407,6 +420,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/profissionais'
       fullPath: '/admin/profissionais'
       preLoaderRoute: typeof AdminProfissionaisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/usuarios': {
+      id: '/admin/usuarios'
+      path: '/admin/usuarios'
+      fullPath: '/admin/usuarios'
+      preLoaderRoute: typeof AdminUsuariosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/artigos/': {
@@ -508,6 +528,7 @@ const rootRouteChildren: RootRouteChildren = {
   SejaProfissionalRoute: SejaProfissionalRoute,
   SobreRoute: SobreRoute,
   AdminProfissionaisRoute: AdminProfissionaisRoute,
+  AdminUsuariosRoute: AdminUsuariosRoute,
   ArtigosSlugRoute: ArtigosSlugRoute,
   ColunasSlugRoute: ColunasSlugRoute,
   ProfissionaisSlugRoute: ProfissionaisSlugRoute,

@@ -255,11 +255,14 @@ function MinhaConta() {
           <div className="mt-8 rounded-3xl bg-primary p-8 text-primary-foreground">
             <h2 className="font-display text-2xl">Painel da administração</h2>
             <p className="mt-2 text-primary-foreground/80">
-              Verifique novos profissionais, acompanhe interações e publique conteúdos.
+              Verifique novos profissionais, gerencie as contas, acompanhe interações e publique conteúdos.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Button variant="cta" size="sm" asChild>
                 <Link to="/admin/profissionais">Novos profissionais</Link>
+              </Button>
+              <Button variant="cta" size="sm" asChild>
+                <Link to="/admin/usuarios">Usuários</Link>
               </Button>
               <Button variant="quiet" size="sm" asChild>
                 <Link to="/comunidade">Moderar comunidade</Link>

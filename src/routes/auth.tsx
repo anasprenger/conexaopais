@@ -94,7 +94,12 @@ function AuthPage() {
         void navigate({ to: "/minha-conta" });
       }
     } catch (erro) {
-      toast.error(erro instanceof Error ? erro.message : "Não foi possível continuar.");
+      const mensagem = erro instanceof Error ? erro.message : "";
+      toast.error(
+        /banned/i.test(mensagem)
+          ? "Esta conta está suspensa. Se achar que é um engano, fale com a administração pela página Contato."
+          : mensagem || "Não foi possível continuar.",
+      );
     } finally {
       setEnviando(false);
     }

@@ -6,6 +6,7 @@ import { ArrowLeft, BookOpen, Download } from "lucide-react";
 import { carregarEdicao, separarResumo } from "@/lib/revista";
 import { resolverPdf } from "@/lib/conteudo";
 import { EdicaoNaoEncontrada } from "@/components/revista/EdicaoNaoEncontrada";
+import { BotaoEditarRevista } from "@/components/admin/BotaoEditarRevista";
 
 export const Route = createFileRoute("/revista/$slug")({
   loader: async ({ params }) => ({ revista: await carregarEdicao(params.slug) }),
@@ -80,9 +81,12 @@ function SinopseEdicao() {
 
           {/* sinopse */}
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-              {revista.etiqueta}
-            </p>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+                {revista.etiqueta}
+              </p>
+              <BotaoEditarRevista key={`${revista.titulo}-${revista.pdf}`} revista={revista} />
+            </div>
             <h1 className="mt-3 font-display text-4xl leading-tight text-primary sm:text-5xl">
               {revista.titulo}
             </h1>
