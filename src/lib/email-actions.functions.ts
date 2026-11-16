@@ -28,7 +28,7 @@ export const submitProfessionalRequest = createServerFn({ method: "POST" })
     if (error || !id) throw new Error(error?.message ?? "Não foi possível enviar a solicitação.");
     await Promise.all([
       safeSend("solicitacao-profissional-recebida", data.email, { name: data.name, profession: data.profession, requestId: id }, `professional-request-received:${id}`),
-      safeSend("admin-novo-profissional", "anasprenger137@gmail.com", { name: data.name, profession: data.profession, registration: data.registration, email: data.email, phone: data.phone, requestId: id }, `admin-professional-request:${id}`, data.email),
+      safeSend("admin-novo-profissional", "", { name: data.name, profession: data.profession, registration: data.registration, email: data.email, phone: data.phone, requestId: id }, `admin-professional-request:${id}`, data.email),
     ]);
     return { id };
   });
@@ -72,7 +72,7 @@ export const submitContactMessage = createServerFn({ method: "POST" }).validator
   const client = createClient<Database>(process.env['SUPABASE_URL']!, key, { auth: { persistSession: false }, global: { fetch: (input, init) => { const headers = new Headers(init?.headers); if (key.startsWith("sb_") && headers.get("Authorization") === `Bearer ${key}`) headers.delete("Authorization"); headers.set("apikey", key); return fetch(input, { ...init, headers }); } } });
   const { data: id, error } = await client.rpc("submit_contact_message", { _name: data.name, _email: data.email, _subject: data.subject ?? "", _message: data.message });
   if (error || !id) throw new Error(error?.message ?? "Não foi possível enviar a mensagem.");
-  await safeSend("admin-novo-contato", "anasprenger137@gmail.com", { name: data.name, email: data.email, subject: data.subject, message: data.message, messageId: id }, `admin-contact:${id}`, data.email);
+  await safeSend("admin-novo-contato", "", { name: data.name, email: data.email, subject: data.subject, message: data.message, messageId: id }, `admin-contact:${id}`, data.email);
   return { id };
 });
 

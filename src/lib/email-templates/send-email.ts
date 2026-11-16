@@ -1,45 +1,39 @@
 import * as React from 'react'
 import { render } from '@react-email/render'
-import { EmailAPIError, sendLovableEmail } from '@lovable.dev/email-js'
 import { TEMPLATES } from './registry'
 
-// Server-only: reads LOVABLE_API_KEY. Never import from client components.
+// Somente no servidor: lê RESEND_API_KEY e ADMIN_EMAIL. Nunca importar em componentes do navegador.
+//
+// Variáveis de ambiente (painel da Hostinger):
+//   RESEND_API_KEY  chave da API do Resend (obrigatória para enviar)
+//   ADMIN_EMAIL     quem recebe os avisos de novo profissional e de contato
+//   EMAIL_FROM      remetente (opcional). Padrão: "Conexão Pais <nao-responda@conexaopais.com>"
+//   EMAIL_REPLY_TO  endereço de resposta (opcional). Padrão: "contato@conexaopais.com"
 
-// Configuration baked in at scaffold time
-const SITE_NAME = "Conexão Pais"
-// SENDER_DOMAIN is the verified sender subdomain FQDN (e.g., "notify.example.com").
-// It MUST match the subdomain delegated to Lovable's nameservers. NEVER use the root domain.
-const SENDER_DOMAIN = "notify.conexaopais.com.br"
-// FROM_DOMAIN is the domain shown in the From: header (e.g., "example.com").
-// Can be the root domain when display_from_root is enabled — this is cosmetic only.
-const FROM_DOMAIN = "conexaopais.com.br"
+const DEFAULT_FROM = 'Conexão Pais <nao-responda@conexaopais.com>'
+const DEFAULT_REPLY_TO = 'contato@conexaopais.com'
 
-export type SendTemplateEmailResult =
-  | { sent: true }
-  | { sent: false; reason: 'recipient_suppressed' }
+export type SendTemplateEmailResult = { sent: true }
 
 export interface SendTemplateEmailOptions {
   templateData?: Record<string, any>
-  /** Dedupes retries of the same logical send; defaults to a random UUID (no dedupe). */
+  /** Evita envio duplicado quando a mesma ação é repetida. */
   idempotencyKey?: string
   replyTo?: string
 }
 
 /**
- * Renders a registered template and sends it through Lovable's managed email
- * API. Suppression, retries, and rate limits are enforced by Lovable
- * server-side. A suppressed recipient is an expected outcome
- * ({ sent: false }); any other failure throws — EmailAPIError exposes
- * .code and .status for branching.
+ * Monta o modelo de email registrado e envia pela API do Resend.
+ * Qualquer falha gera um erro (quem chama decide se ignora).
  */
 export async function sendTemplateEmail(
   templateName: string,
   to: string,
   options: SendTemplateEmailOptions = {}
 ): Promise<SendTemplateEmailResult> {
-  const apiKey = process.env['LOVABLE_API_KEY']
+  const apiKey = process.env['RESEND_API_KEY']
   if (!apiKey) {
-    throw new Error('LOVABLE_API_KEY is not configured')
+    throw new Error('RESEND_API_KEY is not configured')
   }
 
   const template = TEMPLATES[templateName]
@@ -49,11 +43,12 @@ export async function sendTemplateEmail(
     )
   }
 
-  // Template-level `to` takes precedence — notification templates always
-  // send to their fixed address.
-  const recipient = template.to || to
+  // Avisos para a administração vão sempre para ADMIN_EMAIL.
+  const recipient = template.toAdmin ? process.env['ADMIN_EMAIL'] : to
   if (!recipient) {
-    throw new Error('Recipient is required (the template defines no fixed recipient)')
+    throw new Error(
+      template.toAdmin ? 'ADMIN_EMAIL is not configured' : 'Recipient is required'
+    )
   }
 
   const templateData = options.templateData ?? {}
@@ -65,27 +60,27 @@ export async function sendTemplateEmail(
       ? template.subject(templateData)
       : template.subject
 
-  try {
-    await sendLovableEmail(
-      {
-        to: recipient,
-        from: `${SITE_NAME} <sac@${FROM_DOMAIN}>`,
-        sender_domain: SENDER_DOMAIN,
-        subject,
-        html,
-        text,
-        purpose: 'transactional',
-        label: templateName,
-        idempotency_key: options.idempotencyKey || crypto.randomUUID(),
-        ...(options.replyTo ? { reply_to: options.replyTo } : {}),
-      },
-      { apiKey, sendUrl: process.env['LOVABLE_SEND_URL'] }
-    )
-  } catch (error) {
-    if (error instanceof EmailAPIError && error.code === 'recipient_suppressed') {
-      return { sent: false, reason: 'recipient_suppressed' }
-    }
-    throw error
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+      ...(options.idempotencyKey ? { 'Idempotency-Key': options.idempotencyKey.slice(0, 256) } : {}),
+    },
+    body: JSON.stringify({
+      from: process.env['EMAIL_FROM'] || DEFAULT_FROM,
+      to: [recipient],
+      reply_to: options.replyTo || process.env['EMAIL_REPLY_TO'] || DEFAULT_REPLY_TO,
+      subject,
+      html,
+      text,
+      tags: [{ name: 'template', value: templateName.replace(/[^a-zA-Z0-9_-]/g, '_') }],
+    }),
+  })
+
+  if (!response.ok) {
+    const body = await response.text().catch(() => '')
+    throw new Error(`Resend ${response.status}: ${body.slice(0, 300)}`)
   }
 
   return { sent: true }

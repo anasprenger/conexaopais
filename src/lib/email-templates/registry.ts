@@ -13,8 +13,8 @@ export interface TemplateEntry {
   subject: string | ((data: Record<string, any>) => string)
   displayName?: string
   previewData?: Record<string, any>
-  /** Fixed recipient — overrides caller-provided recipientEmail when set. */
-  to?: string
+  /** Aviso para a administração: vai sempre para a variável ADMIN_EMAIL. */
+  toAdmin?: boolean
 }
 
 /**
