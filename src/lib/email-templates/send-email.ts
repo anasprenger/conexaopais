@@ -7,6 +7,7 @@ import { TEMPLATES } from './registry'
 // Variáveis de ambiente (painel da Hostinger):
 //   RESEND_API_KEY  chave da API do Resend (obrigatória para enviar)
 //   ADMIN_EMAIL     quem recebe os avisos de novo profissional e de contato
+//                   (mais de um: separe por vírgula)
 //   EMAIL_FROM      remetente (opcional). Padrão: "Conexão Pais <nao-responda@conexaopais.com>"
 //   EMAIL_REPLY_TO  endereço de resposta (opcional). Padrão: "contato@conexaopais.com"
 
@@ -43,9 +44,13 @@ export async function sendTemplateEmail(
     )
   }
 
-  // Avisos para a administração vão sempre para ADMIN_EMAIL.
-  const recipient = template.toAdmin ? process.env['ADMIN_EMAIL'] : to
-  if (!recipient) {
+  // Avisos para a administração vão sempre para ADMIN_EMAIL
+  // (aceita mais de um endereço, separados por vírgula).
+  const recipients = (template.toAdmin ? process.env['ADMIN_EMAIL'] ?? '' : to)
+    .split(',')
+    .map((email) => email.trim())
+    .filter(Boolean)
+  if (recipients.length === 0) {
     throw new Error(
       template.toAdmin ? 'ADMIN_EMAIL is not configured' : 'Recipient is required'
     )
@@ -69,7 +74,7 @@ export async function sendTemplateEmail(
     },
     body: JSON.stringify({
       from: process.env['EMAIL_FROM'] || DEFAULT_FROM,
-      to: [recipient],
+      to: recipients,
       reply_to: options.replyTo || process.env['EMAIL_REPLY_TO'] || DEFAULT_REPLY_TO,
       subject,
       html,
