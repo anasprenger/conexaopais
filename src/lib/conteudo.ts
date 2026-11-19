@@ -56,6 +56,35 @@ export async function marcarLido(userId: string, slug: string) {
     .maybeSingle();
 }
 
+export type TipoConteudoEvento = "artigo" | "revista" | "coluna";
+
+/**
+ * Registra uma leitura ou um download para o painel de interações. Vale também para
+ * visitantes sem conta. A mesma leitura conta uma vez por aba aberta (sessão do navegador),
+ * para recarregar a página não inflar os números. Downloads contam sempre.
+ */
+export async function registrarEvento(
+  tipo: TipoConteudoEvento,
+  slug: string,
+  evento: "leitura" | "download" = "leitura",
+) {
+  if (typeof window === "undefined") return;
+  if (evento === "leitura") {
+    const chave = `cp-leitura:${tipo}:${slug}`;
+    try {
+      if (window.sessionStorage.getItem(chave)) return;
+      window.sessionStorage.setItem(chave, "1");
+    } catch {
+      /* navegação privada sem sessionStorage: registra mesmo assim */
+    }
+  }
+  try {
+    await supabase.rpc("registrar_evento", { _tipo: tipo, _slug: slug, _evento: evento });
+  } catch {
+    /* estatística não pode atrapalhar a leitura */
+  }
+}
+
 export async function ranking(tipo: TipoInteracao, limite = 5) {
   const { data } = await supabase.rpc("ranking_interacoes", { _tipo: tipo, _limite: limite });
   return data ?? [];

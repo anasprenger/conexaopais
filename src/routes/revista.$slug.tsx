@@ -4,7 +4,7 @@ import { PageLayout } from "@/components/layout/PageLayout";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, BookOpen, Download } from "lucide-react";
 import { carregarEdicao, separarResumo } from "@/lib/revista";
-import { resolverPdf } from "@/lib/conteudo";
+import { registrarEvento, resolverPdf } from "@/lib/conteudo";
 import { EdicaoNaoEncontrada } from "@/components/revista/EdicaoNaoEncontrada";
 import { BotaoEditarRevista } from "@/components/admin/BotaoEditarRevista";
 
@@ -130,7 +130,13 @@ function SinopseEdicao() {
               </Button>
               {linkPdf && (
                 <Button variant="soft" size="lg" asChild>
-                  <a href={linkPdf} download target="_blank" rel="noreferrer">
+                  <a
+                    href={linkPdf}
+                    download
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => void registrarEvento("revista", revista.slug, "download")}
+                  >
                     <Download className="size-4" />
                     Baixar PDF
                   </a>

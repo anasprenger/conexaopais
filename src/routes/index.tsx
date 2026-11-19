@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { artigos, profissionais, revistas } from "@/data/mock";
 import heroImg from "@/assets/hero-familia.jpg";
 import { revistasPublicadas, type RevistaDb } from "@/lib/publicacoes";
+import { cardDaEdicao } from "@/lib/revista";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -38,14 +39,15 @@ function Index() {
   const edicaoPadrao = revistas[0]!;
   const [revistaNova, setRevistaNova] = useState<RevistaDb | null>(null);
   const edicaoAtual = revistaNova
-    ? {
-        slug: revistaNova.slug,
-        titulo: revistaNova.titulo,
-        subtitulo: revistaNova.resumo,
-        descricao: revistaNova.resumo,
-        data: revistaNova.data,
-        edicao: null as number | null,
-      }
+    ? (() => {
+        // Sinopse: texto corrido em cima e os tópicos ("- ...") numa linha abaixo.
+        const card = cardDaEdicao(revistaNova);
+        return {
+          ...card,
+          subtitulo: card.descricao,
+          descricao: card.destaques.length ? `Nesta edição: ${card.destaques.join(" · ")}` : "",
+        };
+      })()
     : edicaoPadrao;
 
   useEffect(() => {
@@ -184,7 +186,9 @@ function Index() {
           <div>
             <h2 className="font-display text-3xl text-primary sm:text-4xl">Nossa revista</h2>
             <p className="mt-4 max-w-xl text-lg text-muted-foreground">{edicaoAtual.subtitulo}</p>
-            <p className="mt-3 max-w-xl text-muted-foreground">{edicaoAtual.descricao}</p>
+            {edicaoAtual.descricao && (
+              <p className="mt-3 max-w-xl text-muted-foreground">{edicaoAtual.descricao}</p>
+            )}
             <div className="mt-7 flex flex-wrap gap-3">
               <Button variant="cta" asChild>
                 <Link to="/revista/$slug" params={{ slug: edicaoAtual.slug }}>

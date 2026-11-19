@@ -72,3 +72,26 @@ export function separarResumo(resumo: string): { texto: string[]; topicos: strin
   }
   return { texto, topicos };
 }
+
+/**
+ * Dados de uma edição publicada pelo site prontos para os cards (início e lista de edições).
+ * O título vem sempre do campo título (o editado em "Editar edição"); a sinopse é separada
+ * em texto e tópicos para não repetir o texto inteiro como título.
+ */
+export function cardDaEdicao(r: {
+  slug: string;
+  titulo: string;
+  resumo: string;
+  data: string;
+}) {
+  const { texto, topicos } = separarResumo(r.resumo);
+  return {
+    slug: r.slug,
+    titulo: r.titulo,
+    subtitulo: r.titulo,
+    descricao: texto.join(" "),
+    data: r.data,
+    destaques: topicos,
+    edicao: null as number | null,
+  };
+}

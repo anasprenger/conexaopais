@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { alternarInteracao, marcarLido, minhasInteracoes } from "@/lib/conteudo";
+import { alternarInteracao, marcarLido, minhasInteracoes, registrarEvento } from "@/lib/conteudo";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/artigos/$slug")({
@@ -113,6 +113,10 @@ function ArtigoPage() {
   useEffect(() => {
     void carregarComentarios();
   }, [carregarComentarios]);
+
+  useEffect(() => {
+    void registrarEvento("artigo", artigo.slug);
+  }, [artigo.slug]);
 
   useEffect(() => {
     if (!user) {

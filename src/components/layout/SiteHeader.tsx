@@ -33,6 +33,7 @@ const titulos: Array<[string, string]> = [
   ["/nova-postagem", "Nova postagem"],
   ["/admin/profissionais", "Novos profissionais"],
   ["/admin/usuarios", "Usuários"],
+  ["/admin/interacoes", "Interações"],
 ];
 
 function tituloDaPagina(pathname: string): string | null {
@@ -193,6 +194,17 @@ export function SiteHeader() {
                   className="block rounded-2xl px-4 py-2 font-display text-xl transition-colors hover:bg-primary-foreground/10"
                 >
                   Usuários
+                </Link>
+              </li>
+            )}
+            {ehAdmin && (
+              <li>
+                <Link
+                  to="/admin/interacoes"
+                  onClick={() => setOpen(false)}
+                  className="block rounded-2xl px-4 py-2 font-display text-xl transition-colors hover:bg-primary-foreground/10"
+                >
+                  Painel de interações
                 </Link>
               </li>
             )}

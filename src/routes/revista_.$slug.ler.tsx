@@ -4,7 +4,7 @@ import { ArrowLeft, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { PaginaPdf } from "@/components/revista/PaginaPdf";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { carregarEdicao, type Edicao } from "@/lib/revista";
-import { resolverPdf } from "@/lib/conteudo";
+import { registrarEvento, resolverPdf } from "@/lib/conteudo";
 import { cn } from "@/lib/utils";
 import { EdicaoNaoEncontrada } from "@/components/revista/EdicaoNaoEncontrada";
 
@@ -46,6 +46,10 @@ function ModoLeitura() {
   const voltarParaSinopse = useCallback(() => {
     void navigate({ to: "/revista/$slug", params: { slug: revista.slug } });
   }, [navigate, revista.slug]);
+
+  useEffect(() => {
+    void registrarEvento("revista", revista.slug);
+  }, [revista.slug]);
 
   useEffect(() => {
     let ativo = true;

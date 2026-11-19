@@ -29,6 +29,7 @@ import {
   type AvisoRemocao,
 } from "@/lib/publicacoes";
 import { BotaoExcluirPublicacao } from "@/components/admin/BotaoExcluirPublicacao";
+import { EditarPublicacaoDialog } from "@/components/publicacoes/EditarPublicacaoDialog";
 import { cn } from "@/lib/utils";
 import { deleteMyAccount } from "@/lib/account.functions";
 import { Trash2, UserRound } from "lucide-react";
@@ -61,14 +62,22 @@ const abas: Array<{ id: Aba; rotulo: string }> = [
   { id: "publicacoes", rotulo: "Minhas publicações" },
   { id: "interacoes", rotulo: "Interações" },
   { id: "lidos", rotulo: "Artigos lidos" },
-  { id: "salvos", rotulo: "Artigos salvos" },
+  { id: "salvos", rotulo: "Salvos" },
 ];
 
 type Interacao = { publicacao_slug: string; tipo: string; created_at: string };
 
+/** Coluna que contém uma publicação (curtidas e salvos de colunas usam o slug da publicação). */
+function colunaDoPost(slug: string) {
+  return colunas.find((c) => c.posts.some((p) => p.slug === slug)) ?? null;
+}
+
 function nomeDoSlug(slug: string) {
+  const coluna = colunaDoPost(slug);
+  const post = coluna?.posts.find((p) => p.slug === slug);
   return (
     artigos.find((a) => a.slug === slug)?.titulo ??
+    (coluna && post ? `${post.titulo} (coluna ${coluna.nome})` : undefined) ??
     colunas.find((c) => c.slug === slug)?.nome ??
     revistas.find((r) => r.slug === slug)?.titulo ??
     slug
@@ -95,6 +104,7 @@ function MinhaConta() {
   const [enviandoFoto, setEnviandoFoto] = useState(false);
   const [interacoes, setInteracoes] = useState<Interacao[]>([]);
   const [publicacoes, setPublicacoes] = useState<PublicacaoDb[]>([]);
+  const [editando, setEditando] = useState<PublicacaoDb | null>(null);
   const [avisos, setAvisos] = useState<AvisoRemocao[]>([]);
   const [confirmacaoExclusao, setConfirmacaoExclusao] = useState("");
   const [excluindoConta, setExcluindoConta] = useState(false);
@@ -263,6 +273,9 @@ function MinhaConta() {
               </Button>
               <Button variant="cta" size="sm" asChild>
                 <Link to="/admin/usuarios">Usuários</Link>
+              </Button>
+              <Button variant="cta" size="sm" asChild>
+                <Link to="/admin/interacoes">Painel de interações</Link>
               </Button>
               <Button variant="quiet" size="sm" asChild>
                 <Link to="/comunidade">Moderar comunidade</Link>
@@ -494,6 +507,14 @@ function MinhaConta() {
                         >
                           {p.titulo}
                         </Link>
+                      ) : p.tipo === "revista" ? (
+                        <Link
+                          to="/revista/$slug"
+                          params={{ slug: p.slug }}
+                          className="mt-1 block font-display text-lg text-primary hover:underline"
+                        >
+                          {p.titulo}
+                        </Link>
                       ) : (
                         <span className="mt-1 block font-display text-lg text-primary">
                           {p.titulo}
@@ -508,6 +529,7 @@ function MinhaConta() {
                         titulo={p.titulo}
                         tipo={p.tipo}
                         autorId={p.autor_id}
+                        aoEditar={() => setEditando(p)}
                         aoExcluir={() =>
                           setPublicacoes((atual) => atual.filter((x) => x.id !== p.id))
                         }
@@ -516,6 +538,18 @@ function MinhaConta() {
                   </li>
                 ))}
               </ul>
+            )}
+            {editando && (
+              <EditarPublicacaoDialog
+                publicacao={editando}
+                aberto={!!editando}
+                aoMudarAberto={(v) => !v && setEditando(null)}
+                aoSalvar={(atualizada) =>
+                  setPublicacoes((atual) =>
+                    atual.map((x) => (x.id === atualizada.id ? atualizada : x)),
+                  )
+                }
+              />
             )}
           </div>
         )}
@@ -552,7 +586,7 @@ function MinhaConta() {
         {aba === "salvos" && (
           <ListaInteracoes
             itens={salvos}
-            vazio="Você ainda não salvou conteúdos. Use o botão Salvar nos artigos."
+            vazio="Você ainda não salvou conteúdos. Use o botão Salvar nos artigos e nas colunas."
           />
         )}
       </section>
@@ -589,6 +623,14 @@ function ListaInteracoes({
               <Link
                 to="/artigos/$slug"
                 params={{ slug: i.publicacao_slug }}
+                className="mt-1 block font-display text-lg text-primary hover:underline"
+              >
+                {nomeDoSlug(i.publicacao_slug)}
+              </Link>
+            ) : colunaDoPost(i.publicacao_slug) ? (
+              <Link
+                to="/colunas/$slug"
+                params={{ slug: colunaDoPost(i.publicacao_slug)!.slug }}
                 className="mt-1 block font-display text-lg text-primary hover:underline"
               >
                 {nomeDoSlug(i.publicacao_slug)}

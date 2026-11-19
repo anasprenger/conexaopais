@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { MoreHorizontal, Trash2 } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -31,6 +31,8 @@ type Props = {
   /** Conteúdo de exemplo do site: some da lista sem precisar de justificativa. */
   exemplo?: boolean | undefined;
   aoExcluir?: (() => void) | undefined;
+  /** Quando informado, o menu também mostra "Editar". */
+  aoEditar?: (() => void) | undefined;
 };
 
 /** Botão visível só para a administração: remove uma publicação e, quando é de outra
@@ -43,6 +45,7 @@ export function BotaoExcluirPublicacao({
   autorId,
   exemplo,
   aoExcluir,
+  aoEditar,
 }: Props) {
   const { user, ehAdmin } = useAuth();
   const [aberto, setAberto] = useState(false);
@@ -119,6 +122,15 @@ export function BotaoExcluirPublicacao({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="rounded-2xl">
+          {aoEditar && (
+            <DropdownMenuItem
+              // Fecha o menu primeiro e só depois abre a janela de edição.
+              onSelect={() => window.setTimeout(aoEditar, 0)}
+            >
+              <Pencil className="size-4" />
+              Editar
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem
             onSelect={(e) => {
               e.preventDefault();

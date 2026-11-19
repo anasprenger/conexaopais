@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { BotaoExcluirPublicacao } from "@/components/admin/BotaoExcluirPublicacao";
 import { useOcultos } from "@/lib/ocultos";
+import { cardDaEdicao, separarResumo } from "@/lib/revista";
 
 export const Route = createFileRoute("/revista/")({
   head: () => ({
@@ -34,25 +35,13 @@ function RevistaIndex() {
   const visiveis = revistas.filter((r) => !estaOculto("revista", r.slug));
   const [novas, setNovas] = useState<RevistaDb[]>([]);
   const novaAtual = novas[0];
-  const atual = novaAtual
-    ? {
-        slug: novaAtual.slug,
-        titulo: novaAtual.titulo,
-        subtitulo: novaAtual.resumo,
-        descricao: novaAtual.resumo,
-        data: novaAtual.data,
-        destaques: [] as string[],
-        edicao: null as number | null,
-      }
-    : visiveis[0];
+  const atual = novaAtual ? cardDaEdicao(novaAtual) : visiveis[0];
   const novasAnteriores = novaAtual ? novas.slice(1) : novas;
   const anteriores = novaAtual ? visiveis : visiveis.slice(1);
 
   useEffect(() => {
     void revistasPublicadas().then(setNovas);
   }, []);
-
-
 
   return (
     <PageLayout>
@@ -96,7 +85,9 @@ function RevistaIndex() {
                 Edição atual
               </span>
               <h3 className="mt-3 font-display text-3xl text-primary">{atual.subtitulo}</h3>
-              <p className="mt-4 text-lg text-muted-foreground">{atual.descricao}</p>
+              {atual.descricao && (
+                <p className="mt-4 text-lg text-muted-foreground">{atual.descricao}</p>
+              )}
               {atual.destaques.length > 0 && (
                 <ul className="mt-6 space-y-2 text-muted-foreground">
                   {atual.destaques.map((d) => (
@@ -134,7 +125,9 @@ function RevistaIndex() {
                       {r.data}
                     </span>
                     <h3 className="mt-3 font-display text-2xl text-primary">{r.titulo}</h3>
-                    <p className="mt-3 text-muted-foreground">{r.resumo}</p>
+                    <p className="mt-3 text-muted-foreground">
+                      {separarResumo(r.resumo).texto.join(" ")}
+                    </p>
                     <span className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-primary">
                       Ler edição
                       <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />

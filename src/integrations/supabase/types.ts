@@ -394,6 +394,17 @@ export type Database = {
         }
         Returns: boolean
       }
+      painel_interacoes: {
+        Args: { _desde?: string | null }
+        Returns: {
+          slug: string
+          leituras: number
+          downloads: number
+          curtidas: number
+          salvos: number
+          comentarios: number
+        }[]
+      }
       public_hidden_content: {
         Args: never
         Returns: {
@@ -432,6 +443,10 @@ export type Database = {
           publicacao_slug: string
           total: number
         }[]
+      }
+      registrar_evento: {
+        Args: { _tipo: string; _slug: string; _evento: string }
+        Returns: undefined
       }
       submit_contact_message: {
         Args: {

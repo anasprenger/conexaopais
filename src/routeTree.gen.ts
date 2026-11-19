@@ -19,6 +19,7 @@ import { Route as MinhaContaRouteImport } from './routes/minha-conta'
 import { Route as NovaPostagemRouteImport } from './routes/nova-postagem'
 import { Route as SejaProfissionalRouteImport } from './routes/seja-profissional'
 import { Route as SobreRouteImport } from './routes/sobre'
+import { Route as AdminInteracoesRouteImport } from './routes/admin.interacoes'
 import { Route as AdminProfissionaisRouteImport } from './routes/admin.profissionais'
 import { Route as AdminUsuariosRouteImport } from './routes/admin.usuarios'
 import { Route as ArtigosIndexRouteImport } from './routes/artigos.index'
@@ -82,6 +83,11 @@ const SejaProfissionalRoute = SejaProfissionalRouteImport.update({
 const SobreRoute = SobreRouteImport.update({
   id: '/sobre',
   path: '/sobre',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminInteracoesRoute = AdminInteracoesRouteImport.update({
+  id: '/admin/interacoes',
+  path: '/admin/interacoes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminProfissionaisRoute = AdminProfissionaisRouteImport.update({
@@ -167,6 +173,7 @@ export interface FileRoutesByFullPath {
   '/nova-postagem': typeof NovaPostagemRoute
   '/seja-profissional': typeof SejaProfissionalRoute
   '/sobre': typeof SobreRoute
+  '/admin/interacoes': typeof AdminInteracoesRoute
   '/admin/profissionais': typeof AdminProfissionaisRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/artigos/$slug': typeof ArtigosSlugRoute
@@ -193,6 +200,7 @@ export interface FileRoutesByTo {
   '/nova-postagem': typeof NovaPostagemRoute
   '/seja-profissional': typeof SejaProfissionalRoute
   '/sobre': typeof SobreRoute
+  '/admin/interacoes': typeof AdminInteracoesRoute
   '/admin/profissionais': typeof AdminProfissionaisRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/artigos/$slug': typeof ArtigosSlugRoute
@@ -220,6 +228,7 @@ export interface FileRoutesById {
   '/nova-postagem': typeof NovaPostagemRoute
   '/seja-profissional': typeof SejaProfissionalRoute
   '/sobre': typeof SobreRoute
+  '/admin/interacoes': typeof AdminInteracoesRoute
   '/admin/profissionais': typeof AdminProfissionaisRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/artigos/$slug': typeof ArtigosSlugRoute
@@ -248,6 +257,7 @@ export interface FileRouteTypes {
     | '/nova-postagem'
     | '/seja-profissional'
     | '/sobre'
+    | '/admin/interacoes'
     | '/admin/profissionais'
     | '/admin/usuarios'
     | '/artigos/$slug'
@@ -274,6 +284,7 @@ export interface FileRouteTypes {
     | '/nova-postagem'
     | '/seja-profissional'
     | '/sobre'
+    | '/admin/interacoes'
     | '/admin/profissionais'
     | '/admin/usuarios'
     | '/artigos/$slug'
@@ -300,6 +311,7 @@ export interface FileRouteTypes {
     | '/nova-postagem'
     | '/seja-profissional'
     | '/sobre'
+    | '/admin/interacoes'
     | '/admin/profissionais'
     | '/admin/usuarios'
     | '/artigos/$slug'
@@ -327,6 +339,7 @@ export interface RootRouteChildren {
   NovaPostagemRoute: typeof NovaPostagemRoute
   SejaProfissionalRoute: typeof SejaProfissionalRoute
   SobreRoute: typeof SobreRoute
+  AdminInteracoesRoute: typeof AdminInteracoesRoute
   AdminProfissionaisRoute: typeof AdminProfissionaisRoute
   AdminUsuariosRoute: typeof AdminUsuariosRoute
   ArtigosSlugRoute: typeof ArtigosSlugRoute
@@ -413,6 +426,13 @@ declare module '@tanstack/react-router' {
       path: '/sobre'
       fullPath: '/sobre'
       preLoaderRoute: typeof SobreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/interacoes': {
+      id: '/admin/interacoes'
+      path: '/admin/interacoes'
+      fullPath: '/admin/interacoes'
+      preLoaderRoute: typeof AdminInteracoesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/profissionais': {
@@ -527,6 +547,7 @@ const rootRouteChildren: RootRouteChildren = {
   NovaPostagemRoute: NovaPostagemRoute,
   SejaProfissionalRoute: SejaProfissionalRoute,
   SobreRoute: SobreRoute,
+  AdminInteracoesRoute: AdminInteracoesRoute,
   AdminProfissionaisRoute: AdminProfissionaisRoute,
   AdminUsuariosRoute: AdminUsuariosRoute,
   ArtigosSlugRoute: ArtigosSlugRoute,

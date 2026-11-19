@@ -1,9 +1,12 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { colunas, profissionais, tempoLeitura } from "@/data/mock";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ChevronDown } from "lucide-react";
+import { ArrowLeft, Bookmark, ChevronDown, Heart } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { alternarInteracao, minhasInteracoes, registrarEvento } from "@/lib/conteudo";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/colunas/$slug")({
@@ -54,7 +57,42 @@ function ColunaNaoEncontrada() {
 
 function ColunaPage() {
   const { coluna, autor } = Route.useLoaderData();
+  const { user } = useAuth();
   const [aberto, setAberto] = useState<string | null>(coluna.posts[0]?.slug ?? null);
+  // Curtidas e salvos das publicações da coluna (pelo slug de cada publicação).
+  const [curtidos, setCurtidos] = useState<Set<string>>(new Set());
+  const [salvos, setSalvos] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (!user) {
+      setCurtidos(new Set());
+      setSalvos(new Set());
+      return;
+    }
+    void minhasInteracoes(user.id).then((dados) => {
+      setCurtidos(new Set(dados.filter((d) => d.tipo === "curtida").map((d) => d.publicacao_slug)));
+      setSalvos(new Set(dados.filter((d) => d.tipo === "salvo").map((d) => d.publicacao_slug)));
+    });
+  }, [user]);
+
+  // Abrir uma publicação conta como leitura no painel de interações.
+  useEffect(() => {
+    if (aberto) void registrarEvento("coluna", aberto);
+  }, [aberto]);
+
+  const alternar = async (slug: string, tipo: "curtida" | "salvo") => {
+    if (!user) {
+      toast.error("Entre na sua conta para curtir e salvar.");
+      return;
+    }
+    const conjunto = tipo === "curtida" ? curtidos : salvos;
+    const ativo = conjunto.has(slug);
+    await alternarInteracao(user.id, slug, tipo, ativo);
+    const novo = new Set(conjunto);
+    if (ativo) novo.delete(slug);
+    else novo.add(slug);
+    (tipo === "curtida" ? setCurtidos : setSalvos)(novo);
+  };
 
   return (
     <PageLayout>
@@ -125,23 +163,35 @@ function ColunaPage() {
                     {post.texto.map((p, i) => (
                       <p key={i}>{p}</p>
                     ))}
+                    <div className="flex flex-wrap gap-3 pt-2">
+                      <Button
+                        variant="soft"
+                        size="sm"
+                        onClick={() => void alternar(post.slug, "curtida")}
+                        aria-pressed={curtidos.has(post.slug)}
+                        className={cn(curtidos.has(post.slug) && "bg-accent/20 text-accent")}
+                      >
+                        <Heart className={cn("size-4", curtidos.has(post.slug) && "fill-current")} />
+                        {curtidos.has(post.slug) ? "Curtido" : "Curtir"}
+                      </Button>
+                      <Button
+                        variant="soft"
+                        size="sm"
+                        onClick={() => void alternar(post.slug, "salvo")}
+                        aria-pressed={salvos.has(post.slug)}
+                        className={cn(salvos.has(post.slug) && "bg-accent/20 text-accent")}
+                      >
+                        <Bookmark
+                          className={cn("size-4", salvos.has(post.slug) && "fill-current")}
+                        />
+                        {salvos.has(post.slug) ? "Salvo" : "Salvar"}
+                      </Button>
+                    </div>
                   </div>
                 )}
               </article>
             );
           })}
-        </div>
-
-        <div className="mt-12 rounded-3xl bg-primary px-8 py-10 text-primary-foreground">
-          <h2 className="font-display text-2xl">Quer comentar esta coluna?</h2>
-          <p className="mt-3 text-primary-foreground/80">
-            Crie sua conta para conversar com o colunista e com outras famílias.
-          </p>
-          <div className="mt-6">
-            <Button variant="cta" asChild>
-              <Link to="/auth">Entrar / criar conta</Link>
-            </Button>
-          </div>
         </div>
       </section>
     </PageLayout>

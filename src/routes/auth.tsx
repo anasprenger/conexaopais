@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
+import { Eye, EyeOff } from "lucide-react";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -35,6 +36,7 @@ function AuthPage() {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [mostrarSenha, setMostrarSenha] = useState(false);
   const [tipoConta, setTipoConta] = useState<"usuario" | "profissional">("usuario");
   const [profissao, setProfissao] = useState("");
   const [registro, setRegistro] = useState("");
@@ -200,15 +202,27 @@ function AuthPage() {
           </div>}
           {modo !== "recuperar" && <div className="space-y-2">
             <Label htmlFor="senha">Senha</Label>
-            <Input
-              id="senha"
-              type="password"
-              value={senha}
-              onChange={(e) => setSenha(e.target.value)}
-              required
-              minLength={6}
-              className="h-11 rounded-2xl"
-            />
+            <div className="relative">
+              <Input
+                id="senha"
+                type={mostrarSenha ? "text" : "password"}
+                value={senha}
+                onChange={(e) => setSenha(e.target.value)}
+                required
+                minLength={6}
+                autoComplete={modo === "entrar" ? "current-password" : "new-password"}
+                className="h-11 rounded-2xl pr-12"
+              />
+              <button
+                type="button"
+                onClick={() => setMostrarSenha((v) => !v)}
+                aria-label={mostrarSenha ? "Ocultar senha" : "Mostrar senha"}
+                aria-pressed={mostrarSenha}
+                className="absolute inset-y-0 right-0 flex w-12 items-center justify-center rounded-r-2xl text-muted-foreground transition-colors hover:text-primary"
+              >
+                {mostrarSenha ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+              </button>
+            </div>
           </div>}
 
           <Button type="submit" variant="cta" className="w-full" disabled={enviando}>
